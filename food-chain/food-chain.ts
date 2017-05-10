@@ -1,45 +1,70 @@
-const animals: string[] = ['fly', 'spider', 'bird', 'cat', 'dog', 'goat', 'cow', 'horse'];
-const maxVerseCount: number = animals.length;
-const rhymes: string[] = [
-    '',
-    'It wriggled and jiggled and tickled inside her.',
-    'How absurd to swallow a bird!',
-    'Imagine that, to swallow a cat!',
-    'What a hog, to swallow a dog!',
-    'Just opened her throat and swallowed a goat!',
-    'I don\'t know how she swallowed a cow!',
-    '',
+type AnimalType = 'fly' | 'spider' | 'bird' | 'cat' | 'dog' | 'goat' | 'cow' | 'horse';
+
+interface Animal {
+    name: AnimalType;
+    verseNumber: number;
+    rhyme?: string;
+    suffix?: string;
+}
+
+const foodChain: Animal[] = [
+    { name: 'fly', verseNumber: 1 },
+    { name: 'spider', verseNumber: 2, rhyme: 'It wriggled and jiggled and tickled inside her.' },
+    { name: 'bird', verseNumber: 3, rhyme: 'How absurd to swallow a bird!', suffix: 'that wriggled and jiggled and tickled inside her' },
+    { name: 'cat', verseNumber: 4, rhyme: 'Imagine that, to swallow a cat!' },
+    { name: 'dog', verseNumber: 5, rhyme: 'What a hog, to swallow a dog!' },
+    { name: 'goat', verseNumber: 6, rhyme: 'Just opened her throat and swallowed a goat!' },
+    { name: 'cow', verseNumber: 7, rhyme: 'I don\'t know how she swallowed a cow!' },
+    { name: 'horse', verseNumber: 8 },
 ];
+const minVerseCount: number = 1;
+const maxVerseCount: number = foodChain.length;
+
+const getAnimal = (verseNumber: number): Animal|undefined => foodChain.find((item) => item.verseNumber === verseNumber);
+const toMultilineString = (input: string[]): string => input.join('\n');
+const appendEmptyLine = (input: string): string => input + '\n';
+const getLastLine = (verseNumber: number) => (verseNumber === maxVerseCount) ? 'She\'s dead, of course!' : 'I don\'t know why she swallowed the fly. Perhaps she\'ll die.';
+const range = (from: number, length: number): number[] => new Array(length).fill(from).map((value, index) => value + index);
+const getMiddleLines = (verseNumber: number): string[] => {
+    const missingVerseNumbers: number[] = range(minVerseCount + 1, verseNumber - 1).reverse();
+    const lines: string[] = [];
+
+    missingVerseNumbers.forEach((verseNumber, index) => {
+        const currentAnimal: Animal|undefined = getAnimal(verseNumber);
+        const previousAnimal: Animal|undefined = getAnimal(verseNumber - 1);
+
+        if (!currentAnimal) {
+            return;
+        }
+
+        if (index === 0 && currentAnimal.rhyme) {
+            lines.push(currentAnimal.rhyme);
+        }
+
+        if (previousAnimal) {
+            const suffix = currentAnimal.suffix ? ` ${currentAnimal.suffix}` : '';
+            lines.push(`She swallowed the ${currentAnimal.name} to catch the ${previousAnimal.name}${suffix}.`);
+        }
+    });
+
+    return lines;
+};
 
 export default class FoodChain {
-    static verse(count: number): string {
-        const lines: string[] = [`I know an old lady who swallowed a ${animals[count - 1]}.`];
+    static verse(verseNumber: number): string {
+        const animal: Animal|undefined = getAnimal(verseNumber);
+        const lines: string[] = [`I know an old lady who swallowed a ${animal ? animal.name : ''}.`];
 
-        if (count > 1 && count < maxVerseCount) {
-            const foo = new Array(count).fill(1).map((v, i) => v + i).reverse();
-
-            foo.map((v, i) => {
-                if (i === 0) {
-                    lines.push(rhymes[v - 1]);
-                }
-                if (v > 1) {
-                    const suffix = animals[v - 1] === 'bird' ? ' that wriggled and jiggled and tickled inside her' : '';
-                    lines.push(`She swallowed the ${animals[v - 1]} to catch the ${animals[v - 2]}${suffix}.`);
-                }
-            });
+        if (verseNumber > minVerseCount && verseNumber < maxVerseCount) {
+            lines.push(...getMiddleLines(verseNumber));
         }
 
-        if (count !== maxVerseCount) {
-            lines.push('I don\'t know why she swallowed the fly. Perhaps she\'ll die.');
-        } else {
-            lines.push('She\'s dead, of course!');
-        }
+        lines.push(getLastLine(verseNumber));
 
-        return lines.join('\n') + '\n';
+        return appendEmptyLine(toMultilineString(lines));
     }
 
-    static verses(from: number = 1, to: number = maxVerseCount): string {
-        const verses = new Array(to - from + 1).fill(1).map((v, i) => v + i);
-        return verses.map((verse) => FoodChain.verse(verse)).join('\n');
+    static verses(from: number = minVerseCount, to: number = maxVerseCount): string {
+        return range(1, to - from + 1).map((verseNumber) => FoodChain.verse(verseNumber)).join('\n');
     }
 }
