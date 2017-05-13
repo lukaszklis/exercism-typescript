@@ -119,7 +119,7 @@
         "arrow-parens": true,
         "new-parens": true,
         "no-consecutive-blank-lines": [true,1],
-        "no-parameter-properties": true,
+        "no-parameter-properties": false,
         "no-unnecessary-initializer": true,
         "object-literal-shorthand": true,
         "object-literal-key-quotes": [true, "as-needed"]
