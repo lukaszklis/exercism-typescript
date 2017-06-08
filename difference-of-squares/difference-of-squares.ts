@@ -1,16 +1,18 @@
 const range = (count: number): number[] => Array(count).fill(1).map((n: number, i: number) => n + i);
-const sum = (currentSum: number, n: number) => currentSum + n;
+const sum = (numbers: number[]): number => numbers.reduce((acc: number, n: number) => acc + n, 0);
+
+const power = 2;
 
 export default class Squares {
     constructor(private count: number) {
     }
 
     get squareOfSums(): number {
-        return Math.pow(range(this.count).reduce(sum, 0), 2);
+        return Math.pow(sum(range(this.count)), power);
     }
 
     get sumOfSquares(): number {
-        return range(this.count).map((n: number) => Math.pow(n, 2)).reduce(sum, 0);
+        return sum(range(this.count).map((n: number) => Math.pow(n, power)));
     }
 
     get difference(): number {
