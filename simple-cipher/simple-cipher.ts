@@ -17,8 +17,8 @@ class SimpleCipher {
     public encode(input: string): string {
         return input
             .split('')
-            .map((_, i) => {
-                let encodedCharCode: number = input.charCodeAt(i) + (this.key.charCodeAt(i % this.key.length) - minCharCode)
+            .map((_, index) => {
+                let encodedCharCode: number = input.charCodeAt(index) + this.getCharCodeOffset(index)
 
                 if (encodedCharCode > maxCharCode) {
                     encodedCharCode -= alphabetLength
@@ -32,8 +32,8 @@ class SimpleCipher {
     public decode(input: string): string {
         return input
             .split('')
-            .map((_, i) => {
-                let encodedCharCode: number = input.charCodeAt(i) - (this.key.charCodeAt(i % this.key.length) - minCharCode)
+            .map((_, index) => {
+                let encodedCharCode: number = input.charCodeAt(index) - this.getCharCodeOffset(index)
 
                 if (encodedCharCode < minCharCode) {
                     encodedCharCode += alphabetLength
@@ -49,6 +49,10 @@ class SimpleCipher {
             .map(() => Math.floor(Math.random() * alphabetLength) + minCharCode)
             .map((charCode) => String.fromCharCode(charCode))
             .join('')
+    }
+
+    private getCharCodeOffset(index: number): number {
+        return this.key.charCodeAt(index % this.key.length) - minCharCode
     }
 }
 
